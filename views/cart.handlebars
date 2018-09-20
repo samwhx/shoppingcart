@@ -1,0 +1,23 @@
+<form method="POST" action="/api/cart">
+  Name:
+  <input type="text" name="name">
+  <br><br>
+  Item:
+  <input type="text" name="content">
+  <button type="submit">Add</button>
+</form>
+<br><br><br>
+<form method="GET" action="/api/cart">
+  Name:
+  <input type="text" name="name">
+  <button type="submit">Load</button>
+</form>
+
+<h1>BASKET</h1>
+  {{#each cart}}
+  {{this}}
+  <br>
+  {{/each}}
+
+<br><br>
+Last Updated on: {{date}}

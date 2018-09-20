@@ -7,9 +7,8 @@ const cors = require('cors') //only used when there is a cross-origin request. e
 
 //start application and others
 const app = express()
-app.engine('hbs', hbs({ defaultLayout: 'index.html'}))
-app.set('view engine', 'hbs')
-app.set('views', 'views')
+app.engine('handlebars', hbs({ defaultLayout: 'index'}))
+app.set('view engine', 'handlebars')
 // app.use(cors)
 
 //predefined data
@@ -17,17 +16,21 @@ let cart = {}
 let date = {}
 
 //routes
+//default route redirect to hbs
+app.get('/', (req, res) => {
+  res.status(200).render('cart', {layout: 'index'})
+})
+
 //GET /api/cart
 app.get('/api/cart', (req, res) => {
   const name = req.query.name
-  specificCart = cart[name]
-  specificDate = date[name]
-  if (name == undefined || specificCart == undefined) {
+  if (name == undefined || cart[name] == undefined) {
     res.status(406).send(`You do not have a saved cart!`).end()
   }
   else {
     res.status(202).format({
-          json: () => {res.json({name: name, content: specificCart, saved: specificDate})}
+          'text/html' : () => {res.render('cart', { cart: cart[name], date:date[name], layout: 'index'})},
+          // json: () => {res.json({name: name, content: specificCart, saved: specificDate})} for angular
     })
   }
 })
@@ -35,13 +38,23 @@ app.get('/api/cart', (req, res) => {
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded())
 app.post('/api/cart', (req, res) => {
+  console.info(req.body)
   const name = req.body.name
   const content = req.body.content
-  const currentDate = new Date().toString
-  cart[name] = content
+  const currentDate = new Date()
+  if (cart[name] == undefined) {
+    temp_array = []
+    temp_array.push(content)
+    cart[name] = temp_array
+  }
+  else {
+    cart[name].push(content)
+  }
+  console.info(cart[name])
   date[name] = currentDate
   res.status(201).format({
-        json: () => {res.json({})}
+        'text/html' : () => {res.render('cart', { cart: cart[name], date: date[name], layout: 'index'})}
+        // json: () => {res.json({})} for angular
   })
 })
 // default route
