@@ -2,7 +2,7 @@
 const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
-const cors = require('cors') //only used when there is a cross-origin request. e.g. diff ports
+//const cors = require('cors') //only used when there is a cross-origin request. e.g. diff ports
 
 //start application and others
 const app = express()
@@ -16,26 +16,20 @@ let date = {}
 //GET /api/cart
 app.get('/api/cart', (req, res) => {
   const name = req.query.name
-  specificCart = cart[name]
-  specificDate = date[name]
-  if (name == undefined || specificCart == undefined) {
-    res.status(406).send(`You do not have a saved cart!`).end()
+  if (!name || !cart[name]) {
+    res.status(406).json({ error: 'You do not have a saved cart!'})
   }
   else {
     res.status(202).format({
-          json: () => {res.json({name: name, content: specificCart, saved: specificDate})}
+          json: () => {res.json({name: name, content: cart[name], saved: date[name]})}
     })
   }
 })
 //POST /api/cart
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded())
-app.post('/api/cart', (req, res) => {
+app.post('/api/cart', bodyParser.json(), bodyParser.urlencoded(), (req, res) => {
   const name = req.body.name
-  const content = req.body.content
-  const currentDate = new Date().toString
-  cart[name] = content
-  date[name] = currentDate
+  cart[name] = req.body.content
+  date[name] = new Date()
   res.status(201).format({
         json: () => {res.json({})}
   })
