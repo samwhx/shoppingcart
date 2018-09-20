@@ -24,34 +24,27 @@ app.get('/', (req, res) => {
 //GET /api/cart
 app.get('/api/cart', (req, res) => {
   const name = req.query.name
-  if (name == undefined || cart[name] == undefined) {
+  if (!name || !cart[name]) {
     res.status(406).send(`You do not have a saved cart!`).end()
   }
   else {
     res.status(202).format({
           'text/html' : () => {res.render('cart', { cart: cart[name], date:date[name], layout: 'index'})},
-          // json: () => {res.json({name: name, content: specificCart, saved: specificDate})} for angular
+          // json: () => {res.json({name: name, content: cart[name], saved: date[name]})} for angular
     })
   }
 })
 //POST /api/cart
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded())
-app.post('/api/cart', (req, res) => {
-  console.info(req.body)
+app.post('/api/cart', bodyParser.json(), bodyParser.urlencoded(), (req, res) => {
   const name = req.body.name
-  const content = req.body.content
-  const currentDate = new Date()
-  if (cart[name] == undefined) {
-    temp_array = []
-    temp_array.push(content)
-    cart[name] = temp_array
+  if (!cart[name]) {
+    cart[name] = []
+    cart[name].push(req.body.content)
   }
   else {
-    cart[name].push(content)
+    cart[name].push(req.body.content)
   }
-  console.info(cart[name])
-  date[name] = currentDate
+  date[name] = new Date()
   res.status(201).format({
         'text/html' : () => {res.render('cart', { cart: cart[name], date: date[name], layout: 'index'})}
         // json: () => {res.json({})} for angular
