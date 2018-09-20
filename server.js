@@ -3,7 +3,7 @@ const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
 const hbs = require('express-handlebars')
-const cors = require('cors') //only used when there is a cross-origin request. e.g. diff ports
+// const cors = require('cors') //only used when there is a cross-origin request. e.g. diff ports
 
 //start application and others
 const app = express()
