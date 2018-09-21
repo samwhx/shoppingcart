@@ -9,29 +9,32 @@ const app = express()
 // app.use(cors)
 
 //predefined data
-let cart = {}
-let date = {}
+let db = {}
 
 //routes
 //GET /api/cart
 app.get('/api/cart', (req, res) => {
   const name = req.query.name
-  if (!name || !cart[name]) {
+  if (!name || !db[name]) {
     res.status(406).json({ error: 'You do not have a saved cart!'})
   }
   else {
     res.status(202).format({
-          json: () => {res.json({name: name, content: cart[name], saved: date[name]})}
+      json: () => {res.json({name: name, content: db[name].cart, saved: db[name].date})}
     })
   }
 })
 //POST /api/cart
 app.post('/api/cart', bodyParser.json(), bodyParser.urlencoded(), (req, res) => {
   const name = req.body.name
-  cart[name] = req.body.content
-  date[name] = new Date()
+  data = {
+    "cart" : req.body.content,
+    "date" : new Date()
+  }
+  db[name] = data
+  console.info (db)
   res.status(201).format({
-        json: () => {res.json({})}
+    json: () => {res.json({})}
   })
 })
 // default route
